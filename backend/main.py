@@ -1,58 +1,146 @@
 """
-Step 1: "Hello memory" test.
+main.py: the web server. It only defines endpoints; the real work is in
+memory.py (Hindsight) and llm.py (Groq).
 
-Goal: prove that we can (1) connect to Hindsight, (2) store one fact,
-(3) get that fact back. Run it with:  python main.py
+Run with:  uvicorn main:app --reload
+Then open: http://localhost:8000
 """
 
-import os
-import time
+import logging
+from pathlib import Path
 
 from dotenv import load_dotenv
-from hindsight_client import Hindsight
 
-# 1. Load secrets from the .env file into environment variables.
-load_dotenv()
+load_dotenv()  # read the .env file BEFORE importing our own modules
 
-HINDSIGHT_URL = os.getenv("HINDSIGHT_URL", "https://api.hindsight.vectorize.io")
-HINDSIGHT_API_KEY = os.getenv("HINDSIGHT_API_KEY")
-BANK_ID = "acme-saas-test"  # the "memory folder" for this test
+from fastapi import BackgroundTasks, FastAPI, HTTPException  # noqa: E402
+from fastapi.responses import FileResponse  # noqa: E402
+from pydantic import BaseModel  # noqa: E402
 
-if not HINDSIGHT_API_KEY:
-    raise SystemExit("HINDSIGHT_API_KEY is missing. Add it to your .env file.")
+import llm  # noqa: E402
+import memory  # noqa: E402
 
-# 2. Connect to Hindsight.
-client = Hindsight(base_url=HINDSIGHT_URL, api_key=HINDSIGHT_API_KEY)
+logging.basicConfig(level=logging.INFO)
 
-# 3. Create the memory bank (ignore the error if it already exists).
-try:
-    client.create_bank(bank_id=BANK_ID, name="Acme SaaS Test Bank")
-    print("Created bank:", BANK_ID)
-except Exception as e:
-    print("Bank not created (it probably already exists):", e)
+from contextlib import asynccontextmanager  # noqa: E402
 
-# 4. RETAIN: store one fact.
-fact = (
-    "Blog post 'How to cut cloud costs' was published on LinkedIn. "
-    "It got 4,200 views and 90 shares. Format: how-to guide."
-)
-client.retain(bank_id=BANK_ID, content=fact, context="content performance")
-print("Retained:", fact)
 
-# 5. RECALL: search for it.
-# Hindsight processes what you store (an LLM extracts facts from the text),
-# so it may take a few seconds before the memory is searchable.
-query = "Which content performed well?"
-for attempt in range(1, 7):
-    result = client.recall(bank_id=BANK_ID, query=query)
-    if result.results:
-        print(f"\nRecall worked (attempt {attempt}). Memories found:")
-        for memory in result.results:
-            print(" -", memory.text)
-        break
-    print(f"Attempt {attempt}: nothing yet, waiting 5 seconds...")
-    time.sleep(5)
-else:
-    print("\nNo memories came back. Check the Hindsight UI to see if the fact was stored.")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await memory.ensure_bank()  # runs once when the server starts
+    yield
 
-client.close()
+
+app = FastAPI(title="Brightlane Content Strategist", lifespan=lifespan)
+STATIC = Path(__file__).resolve().parent.parent / "static"
+
+html_file_path = STATIC / "UI.html"
+
+
+# ------------------------------------------------ request shapes (JSON in)
+
+class ChatIn(BaseModel):
+    message: str
+    memory: bool = True  # the UI's Memory ON/OFF switch
+
+
+class PlanIn(BaseModel):
+    memory: bool = True
+
+
+class FeedbackIn(BaseModel):
+    title: str
+    action: str  # "approved" or "rejected"
+    reason: str = ""
+
+
+# ---------------------------------------------------------------- endpoints
+
+@app.get("/health")
+def health():
+    return {"ok": True}
+
+
+@app.post("/chat")
+async def chat(body: ChatIn, tasks: BackgroundTasks):
+    message = body.message.strip()
+    if not message:
+        raise HTTPException(400, "message is empty")
+
+    used: list[str] = []
+    if body.memory:
+        # Ask memory several different questions, then merge the answers.
+        used = await memory.recall_many([
+            message,
+            "brand voice and target audience",
+            "which content formats and topics perform best",
+            "ideas the marketer approved or rejected, and feedback they gave",
+        ])
+
+    try:
+        text = await llm.chat_answer(message, used if body.memory else None)
+    except Exception as e:
+        raise HTTPException(502, f"LLM error: {e}")
+
+    # Remember what the marketer said (statements like "that was too salesy"),
+    # but not plain questions, or memory fills up with "What should we write?".
+    if body.memory and not message.endswith("?"):
+        tasks.add_task(
+            memory.retain,
+            f'The marketer told the strategist: "{message}"',
+            "feedback from the marketer",
+        )
+
+    return {"text": text, "used": used[:8]}
+
+
+@app.get("/memories")
+async def memories():
+    return await memory.list_memories()
+
+
+@app.post("/load")
+async def load_history():
+    """Store the brand voice notes and all past posts in Hindsight."""
+    return await memory.load_history_into_memory()
+
+
+@app.get("/content")
+def content():
+    """Rows for the Content log table."""
+    return memory.content_rows()
+
+
+@app.post("/plan")
+async def plan(body: PlanIn):
+    used = None
+    if body.memory:
+        used = await memory.recall_many([
+            "which content formats and channels perform best",
+            "which topics were covered recently and which are missing",
+            "brand voice and target audience",
+            "ideas the marketer approved or rejected, and why",
+        ], per_query=8)
+    try:
+        return await llm.weekly_plan(used)
+    except Exception as e:
+        raise HTTPException(502, f"LLM error: {e}")
+
+
+@app.post("/feedback")
+async def feedback(body: FeedbackIn):
+    verb = "approved" if body.action == "approved" else "rejected"
+    sentence = f"The marketer {verb} the content idea: '{body.title}'."
+    if body.reason:
+        sentence += f" Reason: {body.reason}."
+    if verb == "rejected":
+        sentence += " Do not suggest similar ideas again."
+    ok = await memory.retain(sentence, "feedback on a suggested idea")
+    return {"ok": ok}
+
+
+# The web page itself. Serving it from here means the UI's fetch('/chat')
+# calls the same server, so there are no CORS problems.
+@app.get("/")
+def index():
+    return FileResponse(STATIC / "UI.html")

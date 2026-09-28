@@ -1,0 +1,117 @@
+{
+  "company": "Brightlane",
+  "voice_notes": [
+    "Brand voice: we sound casual, with short sentences and no jargon.",
+    "Audience: finance and operations managers at mid-size companies."
+  ],
+  "posts": [
+    {
+      "title": "How to set up approval flows in 10 minutes",
+      "format": "How-to",
+      "channel": "Blog",
+      "published": "2026-07-14",
+      "views": 8100,
+      "conversions": 31,
+      "topic": "Approvals"
+    },
+    {
+      "title": "How to clean up duplicate records",
+      "format": "How-to",
+      "channel": "Blog",
+      "published": "2026-06-30",
+      "views": 10200,
+      "conversions": 41,
+      "topic": "Data quality"
+    },
+    {
+      "title": "Why most automation projects stall",
+      "format": "Opinion",
+      "channel": "LinkedIn",
+      "published": "2026-07-07",
+      "views": 2400,
+      "conversions": 8,
+      "topic": "Automation strategy"
+    },
+    {
+      "title": "Dashboards are not a strategy",
+      "format": "Opinion",
+      "channel": "Blog",
+      "published": "2026-08-04",
+      "views": 3100,
+      "conversions": 11,
+      "topic": "Reporting"
+    },
+    {
+      "title": "How to connect Slack to your workflows",
+      "format": "How-to",
+      "channel": "LinkedIn",
+      "published": "2026-08-11",
+      "views": 9800,
+      "conversions": 36,
+      "topic": "Integrations"
+    },
+    {
+      "title": "How Halden Freight cut invoice errors 42%",
+      "format": "Case study",
+      "channel": "Blog",
+      "published": "2026-08-18",
+      "views": 4200,
+      "conversions": 58,
+      "topic": "Invoicing"
+    },
+    {
+      "title": "How to schedule reports without code",
+      "format": "How-to",
+      "channel": "LinkedIn",
+      "published": "2026-08-25",
+      "views": 9000,
+      "conversions": 29,
+      "topic": "Reporting"
+    },
+    {
+      "title": "Stop calling it digital transformation",
+      "format": "Opinion",
+      "channel": "LinkedIn",
+      "published": "2026-09-01",
+      "views": 3500,
+      "conversions": 12,
+      "topic": "Automation strategy"
+    },
+    {
+      "title": "How to onboard a teammate in one afternoon",
+      "format": "How-to",
+      "channel": "Blog",
+      "published": "2026-09-09",
+      "views": 9900,
+      "conversions": 38,
+      "topic": "Onboarding"
+    },
+    {
+      "title": "Otter Health saved 20 hours a week",
+      "format": "Case study",
+      "channel": "Blog",
+      "published": "2026-09-15",
+      "views": 4800,
+      "conversions": 64,
+      "topic": "Time savings"
+    },
+    {
+      "title": "60 seconds: your first automation",
+      "format": "Video",
+      "channel": "LinkedIn",
+      "published": "2026-09-18",
+      "views": 5200,
+      "conversions": 22,
+      "topic": "Getting started"
+    },
+    {
+      "title": "What 40 teams automated this quarter",
+      "format": "Newsletter",
+      "channel": "Email",
+      "published": "2026-09-22",
+      "views": 6100,
+      "conversions": 52,
+      "topic": "Automation roundup"
+    }
+  ]
+}
