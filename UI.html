@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Brightlane Content Strategist</title>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+--bg:#f6f6fb;--sf:#fff;--ink:#1d1c30;--mu:#6a6980;--ac:#4f46e5;--acs:#eceaff;--ln:#e3e2ee;--ok:#1f8a5b;--no:#c2410c;--fl:#fff3b8}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--no:#f59a6b;--fl:#4a4310}}
+:root[data-theme="dark"]{--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--no:#f59a6b;--fl:#4a4310}
+*,*:before,*:after{box-sizing:inherit}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif}
+header{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:12px 20px;background:var(--sf);border-bottom:1px solid var(--ln)}
+.brand{font-weight:700;font-size:17px}.brand small{display:block;font-weight:400;font-size:12px;color:var(--mu)}
+nav{display:flex;gap:4px;flex:1;overflow-x:auto}
+nav button{border:0;background:none;color:var(--mu);font:inherit;font-weight:500;padding:8px 12px;border-radius:8px;cursor:pointer;white-space:nowrap}
+nav button[aria-selected=true]{background:var(--acs);color:var(--ac)}
+button:focus-visible,input:focus-visible,[contenteditable]:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.sw{display:flex;align-items:center;gap:8px;font-weight:500;cursor:pointer}
+.sw i{width:38px;height:22px;border-radius:11px;background:var(--ln);position:relative;transition:.2s}
+.sw i:after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.sw[aria-checked=true] i{background:var(--ac)}.sw[aria-checked=true] i:after{left:19px}
+.btn{border:1px solid var(--ln);background:var(--sf);color:var(--ink);font:inherit;font-weight:500;padding:7px 12px;border-radius:8px;cursor:pointer}
+.btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.sm{padding:3px 9px;font-size:13px}
+#cap{display:none;padding:8px 20px;background:var(--acs);color:var(--ac);font-weight:600}
+main{padding:16px 20px;max-width:1200px;margin:0 auto}
+.view{display:none}.view.on{display:block}
+.chat{display:grid;grid-template-columns:1fr 320px;gap:16px;height:calc(100vh - 150px);min-height:480px}
+@media(max-width:820px){.chat{grid-template-columns:1fr;height:auto}}
+.box{background:var(--sf);border:1px solid var(--ln);border-radius:12px}
+.cw{display:flex;flex-direction:column;min-height:0}
+#log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:280px}
+.m{max-width:85%;padding:10px 14px;border-radius:12px;background:var(--bg)}
+.m.u{align-self:flex-end;background:var(--ac);color:#fff}
+.m details{margin-top:8px;font-size:13px;color:var(--mu)}.m summary{cursor:pointer;color:var(--ac);font-weight:500}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-self:stretch;max-width:100%}
+.cmp>div{padding:10px 14px;border-radius:12px;background:var(--bg)}.cmp b{display:block;font-size:13px;color:var(--mu)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;padding:0 16px 10px}
+form{display:flex;gap:8px;padding:12px 16px;border-top:1px solid var(--ln)}
+input[type=text]{flex:1;min-width:0;padding:9px 12px;border-radius:8px;border:1px solid var(--ln);background:var(--bg);color:var(--ink);font:inherit}
+aside{padding:14px;overflow:auto}aside h2,.h{font-size:15px;margin:0 0 4px}.sub{color:var(--mu);font-size:13px;margin:0 0 12px}
+.mem{border-left:3px solid var(--c,var(--ac));padding:6px 10px;margin-bottom:8px;background:var(--bg);border-radius:0 8px 8px 0;font-size:13px}
+.mem b{display:block;font-size:12px;color:var(--mu);font-weight:600}
+.mem.new{animation:fl 1.6s}@keyframes fl{from{background:var(--fl)}}
+@media(prefers-reduced-motion:reduce){.mem.new{animation:none}}
+[data-t=voice]{--c:#4f46e5}[data-t=perf]{--c:#1f8a5b}[data-t=gap]{--c:#c2410c}[data-t=feedback]{--c:#b4237a}[data-t=note]{--c:#6a6980}
+.tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:620px}
+th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{color:var(--mu);font-weight:600;font-size:13px}td.n{text-align:right;font-variant-numeric:tabular-nums}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.grid{display:grid;grid-template-columns:repeat(5,minmax(170px,1fr));gap:10px;overflow-x:auto}
+.day h3{margin:0 0 6px;font-size:14px;color:var(--mu)}
+.slot{padding:12px;display:flex;flex-direction:column;gap:6px;min-height:170px}
+.tag{font-size:12px;color:var(--ac);font-weight:600}.st{font-size:12px;color:var(--mu)}.st.ok{color:var(--ok)}
+.ttl{font-weight:600}.why{font-size:13px;color:var(--mu)}
+.acts{display:flex;gap:6px;margin-top:auto}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.two{grid-template-columns:1fr}}
+.card{padding:16px}.hm{display:grid;grid-template-columns:110px repeat(8,1fr);gap:3px;align-items:center;font-size:13px}
+.hm span.c{height:22px;border-radius:4px;background:var(--ln)}.hm span.c.h{background:var(--ac)}
+.empty{color:var(--mu);padding:30px;text-align:center}
+</style></head><body>
+<header>
+<div class="brand">Content Strategist<small>Brightlane, workflow automation for finance teams</small></div>
+<nav role="tablist" id="tabs"></nav>
+<div class="sw" id="sw" role="switch" aria-checked="true" tabindex="0"><i></i><span id="swl">Memory on</span></div>
+<button class="btn p" id="demo">Demo mode</button>
+</header>
+<div id="cap" role="status"></div>
+<main>
+<section class="view on" id="v-chat"><div class="chat">
+<div class="box cw"><div id="log"><div class="empty" id="e1">Ask what to write next. The agent answers from what it remembers about Brightlane.</div></div>
+<div class="chips" id="chips"></div>
+<form id="f"><input type="text" id="q" placeholder="Ask your strategist" aria-label="Message"><button class="btn p">Send</button><button type="button" class="btn" id="cmp">Compare on vs off</button></form></div>
+<aside class="box"><h2>What the agent remembers</h2><p class="sub" id="mc"></p><div id="mems"></div></aside>
+</div></section>
+
+<section class="view" id="v-plan">
+<div class="bar"><div><h2 class="h">This week's plan</h2><p class="sub" style="margin:0">Each idea shows the memories behind it. Reject one and the agent remembers.</p></div>
+<button class="btn p" id="gen">Generate this week's plan</button></div>
+<div class="grid" id="grid"></div></section>
+
+<section class="view" id="v-log">
+<div class="bar"><div><h2 class="h">Content log</h2><p class="sub" style="margin:0">Sample history for a fictional company. Loading it retains what worked into memory.</p></div>
+<button class="btn p" id="load">Load history into memory</button></div>
+<div class="box tw"><table><thead><tr><th>Title</th><th>Format</th><th>Channel</th><th>Published</th><th class="n">Views</th><th class="n">Conversions</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+
+<section class="view" id="v-learn"><div class="two">
+<div class="box card"><h2 class="h">Learning curve</h2><p class="sub">How specific the recommendations were at each stage (sample from demo runs).</p><div id="curve"></div></div>
+<div class="box card"><h2 class="h">Topic coverage, last 8 weeks</h2><p class="sub">Dark cells mean something was published. Empty rows are gaps.</p><div class="hm" id="hm"></div></div>
+</div></section>
+</main>
+<script>
+const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const TY={voice:'Brand voice',perf:'Performance',gap:'Gap',feedback:'Feedback',note:'Interaction'};
+const DATA=[["How to set up approval flows in 10 minutes","How-to","Blog","Jul 14",8100,31],["How to clean up duplicate records","How-to","Blog","Jun 30",10200,41],["Why most automation projects stall","Opinion","LinkedIn","Jul 7",2400,8],["Dashboards are not a strategy","Opinion","Blog","Aug 4",3100,11],["How to connect Slack to your workflows","How-to","LinkedIn","Aug 11",9800,36],["How Halden Freight cut invoice errors 42%","Case study","Blog","Aug 18",4200,58],["How to schedule reports without code","How-to","LinkedIn","Aug 25",9000,29],["Stop calling it digital transformation","Opinion","LinkedIn","Sep 1",3500,12],["How to onboard a teammate in one afternoon","How-to","Blog","Sep 9",9900,38],["Otter Health saved 20 hours a week","Case study","Blog","Sep 15",4800,64],["60 seconds: your first automation","Video","LinkedIn","Sep 18",5200,22],["What 40 teams automated this quarter","Newsletter","Email","Sep 22",6100,52]];
+let on=true,loaded=false,mems=[{t:'voice',x:'We sound casual: short sentences, no jargon.'},{t:'voice',x:'Audience is finance and ops managers at mid-size companies.'}];
+// Placeholder backend: swap these for your real /chat and /memories endpoints.
+async function api(q,m){try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,memory:m})});if(!r.ok)throw 0;return await r.json()}catch(e){return mock(q,m)}}
+function mock(q,m){if(!m)return{text:"Here are a few ideas: an industry trends roundup, a thought leadership piece, a product update post, and an infographic. Keep the tone professional and add a clear call to action.",used:[]};
+const u=mems.filter(x=>x.t!=='note').map(x=>x.x);
+if(!loaded)return{text:"So far I only know your voice: casual, short sentences, no jargon. Load your content history and I can tell you what actually worked.",used:u};
+const rej=mems.some(x=>x.t==='feedback');
+return{text:"Write a how-to on auditing automations for access risks, for LinkedIn. Your how-tos average 9.4k views against 3.0k for opinion pieces, and you haven't published on security in 9 weeks. Keep it casual with short sentences."+(rej?" I'm steering away from angles you rejected.":""),used:u}}
+function renderMems(n){$('#mems').innerHTML='';mems.forEach((m,i)=>{const d=document.createElement('div');d.className='mem'+(i>=mems.length-(n||0)?' new':'');d.dataset.t=m.t;const b=document.createElement('b');b.textContent=TY[m.t];d.append(b,m.x);$('#mems').prepend(d)});$('#mc').textContent=mems.length+' memories, updated after every message'}
+function add(t,x){mems.push({t,x})}
+function bubble(cls,text,used){$('#e1')?.remove();const d=document.createElement('div');d.className='m '+cls;d.textContent=text;
+if(used&&used.length){const de=document.createElement('details'),s=document.createElement('summary');s.textContent='Based on '+used.length+' memories';de.append(s);used.forEach(u=>{const p=document.createElement('div');p.textContent='• '+u;de.append(p)});d.append(de)}
+$('#log').append(d);$('#log').scrollTop=1e9}
+async function ask(q,keep){bubble('u',q);const r=await api(q,on);bubble('a',r.text,r.used);
+if(!keep){add(/too salesy|reject|don't|hate/i.test(q)?'feedback':'note',(/too salesy|reject|don't|hate/i.test(q)?'Feedback: ':'Asked: ')+q.slice(0,80));renderMems(1)}}
+async function compare(q){bubble('u',q);const a=await api(q,false),b=await api(q,true);const d=document.createElement('div');d.className='cmp';
+[['Memory off',a],['Memory on',b]].forEach(([l,r])=>{const c=document.createElement('div'),h=document.createElement('b');h.textContent=l;c.append(h,r.text);d.append(c)});$('#log').append(d);$('#log').scrollTop=1e9}
+function tab(n){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id==='v-'+n));document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.n===n))}
+[['chat','Chat'],['plan','Planner'],['log','Content log'],['learn','Learning curve']].forEach(([n,l])=>{const b=document.createElement('button');b.textContent=l;b.dataset.n=n;b.role='tab';b.onclick=()=>tab(n);$('#tabs').append(b)});
+function setOn(v){on=v;$('#sw').setAttribute('aria-checked',v);$('#swl').textContent=v?'Memory on':'Memory off'}
+$('#sw').onclick=()=>setOn(!on);$('#sw').onkeydown=e=>{if(e.key===' '||e.key==='Enter'){e.preventDefault();setOn(!on)}};
+['What should we write next?','Where are our content gaps?','That last idea was too salesy'].forEach(c=>{const b=document.createElement('button');b.className='btn sm';b.textContent=c;b.onclick=()=>ask(c);$('#chips').append(b)});
+$('#f').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q){$('#q').value='';ask(q)}};
+$('#cmp').onclick=()=>compare($('#q').value.trim()||'What should we write next?');
+DATA.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?c.toLocaleString():c;if(i>3)td.className='n';tr.append(td)});$('#rows').append(tr)});
+function load(){if(loaded)return;loaded=true;['How-to posts average 9.4k views against 3.0k for opinion pieces.','Case studies drive the most conversions, about 61 per piece.','Newsletters convert well for their reach: 52 conversions on 6.1k views.'].forEach(x=>add('perf',x));add('gap','No security content published in the last 9 weeks.');add('gap','Integrations last covered 7 weeks ago.');renderMems(5);$('#load').textContent='History loaded'}
+$('#load').onclick=load;
+const MEM=[["Mon","How-to","LinkedIn","How to audit your automations for access risks","How-tos average 9.4k views, and security has had no coverage for 9 weeks."],["Tue","Case study","Blog","How a regional bank closed its books 3 days faster","Case studies drive the most conversions per piece."],["Wed","Video","LinkedIn","60 seconds: approve invoices from Slack","Casual, short format matches your voice; Slack how-to was your #2 post."],["Thu","How-to","Blog","Connect your CRM in 5 minutes","Integrations were last covered 7 weeks ago."],["Fri","Newsletter","Email","What finance teams automated in September","Your last newsletter converted 52 readers."]],
+GEN=[["Mon","Roundup","Blog","Industry trends roundup","Generic idea, no history to draw on."],["Tue","Thought piece","LinkedIn","The future of automation","Generic idea, no history to draw on."],["Wed","Announcement","Blog","Product update post","Generic idea, no history to draw on."],["Thu","Infographic","LinkedIn","Automation by the numbers","Generic idea, no history to draw on."],["Fri","Webinar","Email","Join our upcoming webinar","Generic idea, no history to draw on."]],
+ALT=["10 approval mistakes finance teams make","Behind the scenes: how we build integrations","Customer story: 20 hours saved a week","A checklist for your month-end close","Quick tip: rename your workflows"];
+let plan=[];
+function drawPlan(){const g=$('#grid');g.innerHTML='';if(!plan.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">No plan yet. Generate one and see what the agent suggests.</div>';return}
+plan.forEach((p,i)=>{const d=document.createElement('div');d.className='day';const h=document.createElement('h3');h.textContent=p.d;const c=document.createElement('div');c.className='box slot';
+const tg=document.createElement('div');tg.className='tag';tg.textContent=p.f+' on '+p.c;const t=document.createElement('div');t.className='ttl';t.contentEditable=true;t.textContent=p.t;t.oninput=()=>p.t=t.textContent;
+const st=document.createElement('div');st.className='st'+(p.s==='Scheduled'?' ok':'');st.textContent=p.s;
+const dt=document.createElement('details');dt.className='why';const sm=document.createElement('summary');sm.textContent='Why this?';sm.style.cursor='pointer';dt.append(sm,p.w);
+const a=document.createElement('div');a.className='acts';
+const ap=document.createElement('button');ap.className='btn sm';ap.textContent='Approve';ap.onclick=()=>{p.s='Scheduled';add('feedback','Approved: '+p.t.slice(0,60));renderMems(1);drawPlan()};
+const rj=document.createElement('button');rj.className='btn sm';rj.textContent='Reject';rj.onclick=()=>{add('feedback','Rejected: '+p.t.slice(0,60)+', do not suggest similar.');renderMems(1);p.t=ALT[i];p.w='Replaced after you rejected the first idea.';p.s='Idea';drawPlan()};
+a.append(ap,rj);c.append(tg,t,st,dt,a);d.append(h,c);g.append(d)})}
+function gen(){plan=(on?MEM:GEN).map(r=>({d:r[0],f:r[1],c:r[2],t:r[3],w:on?r[4]:r[4],s:'Idea'}));drawPlan()}
+$('#gen').onclick=gen;drawPlan();
+// Learning curve + coverage
+(()=>{const v=[['Interaction 1',18],['Interaction 5',61],['Interaction 20',89]];let s='<svg viewBox="0 0 320 190" width="100%" role="img" aria-label="Specificity rises from 18 to 89 percent">';
+v.forEach(([l,n],i)=>{const h=n*1.4,x=30+i*95;s+=`<rect x="${x}" y="${150-h}" width="60" height="${h}" rx="6" fill="var(--ac)" opacity="${.4+i*.3}"/><text x="${x+30}" y="${142-h}" text-anchor="middle" fill="var(--ink)" font-size="13" font-weight="600">${n}%</text><text x="${x+30}" y="172" text-anchor="middle" fill="var(--mu)" font-size="11">${l}</text>`});$('#curve').innerHTML=s+'</svg>'})();
+(()=>{const T={Automation:[1,0,1,1,0,1,1,1],Integrations:[0,1,0,0,0,0,0,0],Security:[0,0,0,0,0,0,0,0],Onboarding:[0,0,0,0,0,0,1,0],'Case studies':[0,0,1,0,0,0,1,0]},h=$('#hm');
+Object.entries(T).forEach(([k,r])=>{const l=document.createElement('span');l.textContent=k;h.append(l);r.forEach(c=>{const s=document.createElement('span');s.className='c'+(c?' h':'');h.append(s)})})})();
+renderMems(0);
+// Demo mode
+async function cap(t){const c=$('#cap');c.style.display=t?'block':'none';c.textContent=t}
+$('#demo').onclick=async()=>{const b=$('#demo');b.disabled=true;$('#log').innerHTML='';mems=mems.slice(0,2);loaded=false;plan=[];drawPlan();$('#load').textContent='Load history into memory';renderMems(0);
+const Q='What should we write next?';
+tab('chat');setOn(false);await cap('1. No memory: generic ideas any company would get');await sleep(1200);await ask(Q,1);await sleep(2600);
+tab('log');await cap('2. Feeding it the content history');await sleep(1500);load();setOn(true);await sleep(2200);
+tab('chat');await cap('3. Same question, now with memory');await sleep(1000);await ask(Q,1);await sleep(3200);
+tab('plan');await cap('4. Next week, planned from what worked');await sleep(1200);gen();await sleep(3000);
+await cap('This gets smarter every week.');await sleep(2500);await cap('');b.disabled=false};
+</script></body></html>
