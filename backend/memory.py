@@ -23,15 +23,26 @@ _client = None
 
 
 def client() -> Hindsight:
-    """Create the Hindsight client once and reuse it."""
+    """Return the current Hindsight client."""
     global _client
+
     if _client is None:
         _client = Hindsight(
             base_url=os.getenv("HINDSIGHT_URL", "https://api.hindsight.vectorize.io"),
             api_key=os.getenv("HINDSIGHT_API_KEY"),
             timeout=60.0,
         )
+
     return _client
+
+
+async def close_client() -> None:
+    """Close the Hindsight client and reset it."""
+    global _client
+
+    if _client is not None:
+        await _client.aclose()
+        _client = None
 
 
 def _texts(result) -> list[str]:

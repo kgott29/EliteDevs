@@ -8,6 +8,7 @@ Then open: http://127.0.0.1:8000
 
 import logging
 from pathlib import Path
+import json
 
 from dotenv import load_dotenv
 
@@ -27,8 +28,12 @@ from contextlib import asynccontextmanager  # noqa: E402
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await memory.ensure_bank()  # runs once when the server starts
-    yield
+    await memory.ensure_bank()
+
+    try:
+        yield
+    finally:
+        await memory.close_client()
 
 
 app = FastAPI(title="Brightlane Content Strategist", lifespan=lifespan)
@@ -145,3 +150,9 @@ async def feedback(body: FeedbackIn):
 @app.get("/")
 def index():
     return FileResponse(STATIC / "UI.html")
+@app.get("/learning-curve")
+def learning_curve():
+    f = Path(__file__).parent / "learning_curve.json"
+    if not f.exists():
+        raise HTTPException(404, "run eval_learning_curve.py first")
+    return json.loads(f.read_text())
