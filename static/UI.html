@@ -95,6 +95,9 @@ const DATA=[["How to set up approval flows in 10 minutes","How-to","Blog","Jul 1
 let on=true,loaded=false,mems=[{t:'voice',x:'We sound casual: short sentences, no jargon.'},{t:'voice',x:'Audience is finance and ops managers at mid-size companies.'}];
 // Placeholder backend: swap these for your real /chat and /memories endpoints.
 async function api(q,m){try{const r=await fetch('/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,memory:m})});if(!r.ok)throw 0;return await r.json()}catch(e){return mock(q,m)}}
+function post(u,b){return fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).catch(()=>{})}
+let rejected=[];
+async function refreshMems(){try{const r=await fetch('/memories');if(!r.ok)return false;const d=await r.json();if(Array.isArray(d)&&d.length){mems=d;renderMems(0);return true}}catch(e){}return false}
 function mock(q,m){if(!m)return{text:"Here are a few ideas: an industry trends roundup, a thought leadership piece, a product update post, and an infographic. Keep the tone professional and add a clear call to action.",used:[]};
 const u=mems.filter(x=>x.t!=='note').map(x=>x.x);
 if(!loaded)return{text:"So far I only know your voice: casual, short sentences, no jargon. Load your content history and I can tell you what actually worked.",used:u};
@@ -116,9 +119,16 @@ $('#sw').onclick=()=>setOn(!on);$('#sw').onkeydown=e=>{if(e.key===' '||e.key==='
 ['What should we write next?','Where are our content gaps?','That last idea was too salesy'].forEach(c=>{const b=document.createElement('button');b.className='btn sm';b.textContent=c;b.onclick=()=>ask(c);$('#chips').append(b)});
 $('#f').onsubmit=e=>{e.preventDefault();const q=$('#q').value.trim();if(q){$('#q').value='';ask(q)}};
 $('#cmp').onclick=()=>compare($('#q').value.trim()||'What should we write next?');
-DATA.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?c.toLocaleString():c;if(i>3)td.className='n';tr.append(td)});$('#rows').append(tr)});
-function load(){if(loaded)return;loaded=true;['How-to posts average 9.4k views against 3.0k for opinion pieces.','Case studies drive the most conversions, about 61 per piece.','Newsletters convert well for their reach: 52 conversions on 6.1k views.'].forEach(x=>add('perf',x));add('gap','No security content published in the last 9 weeks.');add('gap','Integrations last covered 7 weeks ago.');renderMems(5);$('#load').textContent='History loaded'}
-$('#load').onclick=load;
+function renderRows(rows){$('#rows').innerHTML='';rows.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?c.toLocaleString():c;if(i>3)td.className='n';tr.append(td)});$('#rows').append(tr)})}
+renderRows(DATA);fetch('/content').then(r=>r.ok?r.json():null).then(d=>{if(Array.isArray(d)&&d.length)renderRows(d)}).catch(()=>{});
+function mockLoad(){['How-to posts average 9.4k views against 3.0k for opinion pieces.','Case studies drive the most conversions, about 61 per piece.','Newsletters convert well for their reach: 52 conversions on 6.1k views.'].forEach(x=>add('perf',x));add('gap','No security content published in the last 9 weeks.');add('gap','Integrations last covered 7 weeks ago.');renderMems(5)}
+async function load(demo){if(loaded)return;loaded=true;
+if(demo){if(!(await refreshMems()))mockLoad();$('#load').textContent='History loaded';return}
+$('#load').textContent='Storing history...';
+try{const r=await fetch('/load',{method:'POST'});if(!r.ok)throw 0;const d=await r.json();$('#load').textContent='Stored '+d.retained+' items, processing...';
+for(let i=0;i<9;i++){await sleep(10000);if(await refreshMems())break}
+$('#load').textContent='History loaded'}catch(e){mockLoad();$('#load').textContent='History loaded (offline)'}}
+$('#load').onclick=()=>load(false);
 const MEM=[["Mon","How-to","LinkedIn","How to audit your automations for access risks","How-tos average 9.4k views, and security has had no coverage for 9 weeks."],["Tue","Case study","Blog","How a regional bank closed its books 3 days faster","Case studies drive the most conversions per piece."],["Wed","Video","LinkedIn","60 seconds: approve invoices from Slack","Casual, short format matches your voice; Slack how-to was your #2 post."],["Thu","How-to","Blog","Connect your CRM in 5 minutes","Integrations were last covered 7 weeks ago."],["Fri","Newsletter","Email","What finance teams automated in September","Your last newsletter converted 52 readers."]],
 GEN=[["Mon","Roundup","Blog","Industry trends roundup","Generic idea, no history to draw on."],["Tue","Thought piece","LinkedIn","The future of automation","Generic idea, no history to draw on."],["Wed","Announcement","Blog","Product update post","Generic idea, no history to draw on."],["Thu","Infographic","LinkedIn","Automation by the numbers","Generic idea, no history to draw on."],["Fri","Webinar","Email","Join our upcoming webinar","Generic idea, no history to draw on."]],
 ALT=["10 approval mistakes finance teams make","Behind the scenes: how we build integrations","Customer story: 20 hours saved a week","A checklist for your month-end close","Quick tip: rename your workflows"];
@@ -129,24 +139,30 @@ const tg=document.createElement('div');tg.className='tag';tg.textContent=p.f+' o
 const st=document.createElement('div');st.className='st'+(p.s==='Scheduled'?' ok':'');st.textContent=p.s;
 const dt=document.createElement('details');dt.className='why';const sm=document.createElement('summary');sm.textContent='Why this?';sm.style.cursor='pointer';dt.append(sm,p.w);
 const a=document.createElement('div');a.className='acts';
-const ap=document.createElement('button');ap.className='btn sm';ap.textContent='Approve';ap.onclick=()=>{p.s='Scheduled';add('feedback','Approved: '+p.t.slice(0,60));renderMems(1);drawPlan()};
-const rj=document.createElement('button');rj.className='btn sm';rj.textContent='Reject';rj.onclick=()=>{add('feedback','Rejected: '+p.t.slice(0,60)+', do not suggest similar.');renderMems(1);p.t=ALT[i];p.w='Replaced after you rejected the first idea.';p.s='Idea';drawPlan()};
+const ap=document.createElement('button');ap.className='btn sm';ap.textContent='Approve';ap.onclick=()=>{p.s='Scheduled';add('feedback','Approved: '+p.t.slice(0,60));renderMems(1);drawPlan();post('/feedback',{title:p.t,action:'approved'})};
+const rj=document.createElement('button');rj.className='btn sm';rj.textContent='Reject';rj.onclick=async()=>{const old=p.t;rejected.push(old);add('feedback','Rejected: '+old.slice(0,60)+', do not suggest similar.');renderMems(1);post('/feedback',{title:old,action:'rejected'});p.w='Finding a replacement...';drawPlan();
+let alt=null;try{const r=await fetch('/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memory:on,avoid:rejected.concat(plan.map(x=>x.t))})});if(r.ok){const rows=await r.json();alt=rows.find(x=>x.d===p.d)||rows[i]}}catch(e){}
+if(alt&&alt.t){p.t=alt.t;p.f=alt.f;p.c=alt.c;p.w=alt.w}else{p.t=ALT[i];p.w='Replaced after you rejected the first idea.'}
+p.s='Idea';drawPlan()};
 a.append(ap,rj);c.append(tg,t,st,dt,a);d.append(h,c);g.append(d)})}
-function gen(){plan=(on?MEM:GEN).map(r=>({d:r[0],f:r[1],c:r[2],t:r[3],w:on?r[4]:r[4],s:'Idea'}));drawPlan()}
+async function gen(){const b=$('#gen');b.disabled=true;b.textContent='Planning...';let rows=null;
+try{const r=await fetch('/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({memory:on,avoid:rejected})});if(!r.ok)throw 0;rows=await r.json()}catch(e){}
+plan=rows?rows.map(x=>({d:x.d,f:x.f,c:x.c,t:x.t,w:x.w,s:'Idea'})):(on?MEM:GEN).map(r=>({d:r[0],f:r[1],c:r[2],t:r[3],w:r[4],s:'Idea'}));
+drawPlan();b.disabled=false;b.textContent="Generate this week's plan"}
 $('#gen').onclick=gen;drawPlan();
 // Learning curve + coverage
 (()=>{const v=[['Interaction 1',18],['Interaction 5',61],['Interaction 20',89]];let s='<svg viewBox="0 0 320 190" width="100%" role="img" aria-label="Specificity rises from 18 to 89 percent">';
 v.forEach(([l,n],i)=>{const h=n*1.4,x=30+i*95;s+=`<rect x="${x}" y="${150-h}" width="60" height="${h}" rx="6" fill="var(--ac)" opacity="${.4+i*.3}"/><text x="${x+30}" y="${142-h}" text-anchor="middle" fill="var(--ink)" font-size="13" font-weight="600">${n}%</text><text x="${x+30}" y="172" text-anchor="middle" fill="var(--mu)" font-size="11">${l}</text>`});$('#curve').innerHTML=s+'</svg>'})();
 (()=>{const T={Automation:[1,0,1,1,0,1,1,1],Integrations:[0,1,0,0,0,0,0,0],Security:[0,0,0,0,0,0,0,0],Onboarding:[0,0,0,0,0,0,1,0],'Case studies':[0,0,1,0,0,0,1,0]},h=$('#hm');
 Object.entries(T).forEach(([k,r])=>{const l=document.createElement('span');l.textContent=k;h.append(l);r.forEach(c=>{const s=document.createElement('span');s.className='c'+(c?' h':'');h.append(s)})})})();
-renderMems(0);
+renderMems(0);refreshMems();
 // Demo mode
 async function cap(t){const c=$('#cap');c.style.display=t?'block':'none';c.textContent=t}
 $('#demo').onclick=async()=>{const b=$('#demo');b.disabled=true;$('#log').innerHTML='';mems=mems.slice(0,2);loaded=false;plan=[];drawPlan();$('#load').textContent='Load history into memory';renderMems(0);
 const Q='What should we write next?';
 tab('chat');setOn(false);await cap('1. No memory: generic ideas any company would get');await sleep(1200);await ask(Q,1);await sleep(2600);
-tab('log');await cap('2. Feeding it the content history');await sleep(1500);load();setOn(true);await sleep(2200);
+tab('log');await cap('2. Feeding it the content history');await sleep(1500);await load(true);setOn(true);await sleep(2200);
 tab('chat');await cap('3. Same question, now with memory');await sleep(1000);await ask(Q,1);await sleep(3200);
-tab('plan');await cap('4. Next week, planned from what worked');await sleep(1200);gen();await sleep(3000);
+tab('plan');await cap('4. Next week, planned from what worked');await sleep(1200);await gen();await sleep(3000);
 await cap('This gets smarter every week.');await sleep(2500);await cap('');b.disabled=false};
 </script></body></html>

@@ -3,7 +3,7 @@ main.py: the web server. It only defines endpoints; the real work is in
 memory.py (Hindsight) and llm.py (Groq).
 
 Run with:  uvicorn main:app --reload
-Then open: http://localhost:8000
+Then open: http://127.0.0.1:8000
 """
 
 import logging
@@ -46,6 +46,7 @@ class ChatIn(BaseModel):
 
 class PlanIn(BaseModel):
     memory: bool = True
+    avoid: list[str] = []  # ideas rejected in this session (shown right away)
 
 
 class FeedbackIn(BaseModel):
@@ -122,7 +123,7 @@ async def plan(body: PlanIn):
             "ideas the marketer approved or rejected, and why",
         ], per_query=8)
     try:
-        return await llm.weekly_plan(used)
+        return await llm.weekly_plan(used, body.avoid)
     except Exception as e:
         raise HTTPException(502, f"LLM error: {e}")
 

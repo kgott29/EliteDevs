@@ -93,10 +93,14 @@ def _parse_plan(raw: str) -> list[dict]:
     return plan
 
 
-async def weekly_plan(memories: list[str] | None) -> list[dict]:
+async def weekly_plan(memories: list[str] | None, avoid: list[str] | None = None) -> list[dict]:
+    avoid_text = (
+        "\nDo NOT suggest these ideas or close variants of them: " + "; ".join(avoid) + "\n"
+        if avoid else ""
+    )
     prompt = (
         f"Today's date is {date.today():%B %d, %Y}.\n\n"
-        f"{_memory_block(memories)}\n\n"
+        f"{_memory_block(memories)}\n{avoid_text}\n"
         "Plan next week's content: exactly 5 items, Monday to Friday.\n"
         "Reply with ONLY a JSON list, no other text. Each item must be an "
         'object with these keys: "d" (day: Mon, Tue, Wed, Thu or Fri), '
