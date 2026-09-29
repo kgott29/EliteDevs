@@ -32,15 +32,8 @@ With memory **off**, `/chat` and `/plan` never call `recall()` — the LLM gets 
 
 ## Architecture
 
-```
-Browser (static/index.html, vanilla JS)
-      │  fetch()
-      ▼
-FastAPI backend (main.py)
-      │                      │
-      ▼                      ▼
-memory.py (Hindsight)   llm.py (Groq)
-```
+<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/615b7366-45c4-41eb-8d81-af49c4f96ec3" />
+
 
 - **`main.py`** — the only file with HTTP endpoints. Owns request/response shapes and orchestrates calls to `memory.py` and `llm.py`. Serves the frontend directly (avoids CORS).
 - **`memory.py`** — every Hindsight call lives here. Nothing else in the codebase talks to Hindsight directly.
