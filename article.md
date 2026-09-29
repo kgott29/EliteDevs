@@ -8,6 +8,10 @@ The system is a content strategist for a B2B SaaS marketing team. It watches wha
 
 Under the hood it's three pieces talking to each other. A FastAPI backend sits in the middle. On one side it calls [Hindsight](https://hindsight.vectorize.io/), the memory layer from [Vectorize](https://vectorize.io/what-is-agent-memory) that stores and retrieves what the agent has learned. On the other side it calls an LLM (I used Groq) to turn those memories into an actual plan. The frontend is deliberately plain — a chat panel, a weekly planner, a memory sidebar — because the interesting engineering isn't in the UI, it's in what happens between "the model recalled five memories" and "the model wrote five sentences."
 
+<img width="1917" height="913" alt="image" src="https://github.com/user-attachments/assets/eff709ab-ab9f-4a95-9665-1150b90ebc22" />
+
+*The chat panel with the memory sidebar. Each answer shows how many memories it was based on.*
+
 Every time something happens — a post goes live, an idea gets rejected, a marketer gives feedback — the backend calls `retain()` on a Hindsight memory bank scoped to that company. Every time the agent needs to answer something, it calls `recall()` first and feeds whatever comes back into the prompt. That part of the architecture is almost boringly simple. The part that took real iteration was making sure the agent's claims about its own memory were actually true.
 
 ## The core problem: language models love to sound certain
@@ -50,6 +54,10 @@ for i, item in enumerate(items[:5]):
 `known` is the exact set of memory strings that were recalled from Hindsight and placed in the prompt for this request. If the string the model returns in `src` isn't a member of that set — character for character — it gets wiped out server-side before the plan ever reaches the UI. There's no partial credit, no fuzzy matching, no "close enough." A citation is either a memory that genuinely came out of `recall()`, or it's nothing.
 
 The UI change that follows from this is just as important as the backend one. Instead of a vague "based on your memory" badge, each idea in the planner shows the actual sentence it's citing, quoted, right under the idea. If there's no `src`, there's no quote — the idea is shown as a plain suggestion with no implied evidence behind it. The agent went from asserting expertise to demonstrating it, and the difference is that one of those can be checked and the other can't.
+
+<img width="1917" height="912" alt="image" src="https://github.com/user-attachments/assets/8b71083d-777a-4003-b337-fe2226299357" />
+
+*The weekly planner. Each idea has a "Why this?" section showing the memory it cites, or nothing if no real memory backs it.*
 
 ## Streaming made the honesty problem harder, not easier
 
@@ -114,5 +122,8 @@ It's still a heuristic, not a semantic understanding of the sentence, and I'm no
 **Streaming changes your architecture, not just your UI.** Once responses arrive incrementally, you have to decide what the client can trust before the text has even finished — which forces you to formalize your trust logic instead of leaving it implicit in the final response shape.
 
 **Test your own heuristics as adversarially as you'd test the model.** The nudge bug didn't come from the LLM at all — it came from code I wrote and trusted without trying to break it. The parts of the system I was most confident about turned out to be the parts I'd checked the least.
+
+<img width="1917" height="906" alt="image" src="https://github.com/user-attachments/assets/abe42e10-3457-4783-86dc-4b622996fd37" />
+*The share of ideas that cite real evidence, by interaction.*
 
 None of this makes the agent smarter in the way a bigger model or a longer context window would. It makes the agent honest about the difference between what it knows and what it's guessing, which turns out to matter a lot more once a real person is deciding whether to act on what it says. If you're building something on [Hindsight](https://github.com/vectorize-io/hindsight), that's the bar I'd aim for: not an agent that remembers more, but one you can actually trust when it tells you what it remembers.
