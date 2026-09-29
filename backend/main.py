@@ -29,6 +29,20 @@ from contextlib import asynccontextmanager  # noqa: E402
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await memory.ensure_bank()  # runs once when the server starts
+
+    # Load the company's history into memory automatically, so the agent
+    # already remembers everything the moment the server is up — nobody
+    # has to click a "Load history" button first for Memory ON to work.
+    # We only do this if the bank looks empty, so restarting the server
+    # doesn't re-retain the same facts over and over.
+    existing = await memory.list_memories()
+    if not existing:
+        logging.info("Memory bank is empty — loading seed history now...")
+        result = await memory.load_history_into_memory()
+        logging.info("Seed history loaded: %s", result)
+    else:
+        logging.info("Memory already has %d items — skipping seed load.", len(existing))
+
     yield
 
 
@@ -55,6 +69,14 @@ class FeedbackIn(BaseModel):
     title: str
     action: str  # "approved" or "rejected"
     reason: str = ""
+    format: str = ""   # only used when action == "approved"
+    channel: str = ""  # only used when action == "approved"
+
+
+class PerformanceIn(BaseModel):
+    title: str
+    views: int
+    conversions: int
 
 
 # ---------------------------------------------------------------- endpoints
@@ -176,7 +198,26 @@ async def feedback(body: FeedbackIn):
     if verb == "rejected":
         sentence += " Do not suggest similar ideas again."
     ok = await memory.retain(sentence, "feedback on a suggested idea")
+
+    if verb == "approved":
+        # An approved idea is now real, published content: it belongs in
+        # the Content Log immediately (as "Pending", since it has no
+        # results yet), not just a one-line note buried in memory.
+        row = memory.add_published_idea(body.title, body.format, body.channel)
+        await memory.retain(memory.pending_sentence(row), "content performance")
+
     return {"ok": ok}
+
+
+@app.post("/performance")
+async def performance(body: PerformanceIn):
+    """Record real results for something that was approved earlier. This
+    is what lets the agent's own past suggestions become evidence for
+    future ones."""
+    ok = await memory.record_performance(body.title, body.views, body.conversions)
+    if not ok:
+        raise HTTPException(404, "no pending (unmeasured) idea with that title")
+    return {"ok": True}
 
 
 # The web page itself. Serving it from here means the UI's fetch('/chat')

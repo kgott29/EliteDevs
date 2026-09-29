@@ -88,13 +88,13 @@ th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{colo
 </section>
 
 <section class="view" id="v-log">
-<div class="bar"><div><h2 class="h">Content log</h2><p class="sub" style="margin:0">Sample history for a fictional company. Loading it stores what worked in Hindsight.</p></div>
-<button class="btn p" id="load">Load history into memory</button></div>
-<div class="box tw"><table><thead><tr><th>Title</th><th>Format</th><th>Channel</th><th>Published</th><th class="n">Views</th><th class="n">Conversions</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+<div class="bar"><div><h2 class="h">Content log</h2><p class="sub" style="margin:0">This is the raw history behind everything the agent remembers. Approve an idea in the Planner and it shows up here as "Pending" — record its real results once they're in, and the agent can cite them later.</p></div>
+<button class="btn" id="load">Resync memory</button></div>
+<div class="box tw"><table><thead><tr><th>Title</th><th>Format</th><th>Channel</th><th>Published</th><th class="n">Views</th><th class="n">Conversions</th><th></th></tr></thead><tbody id="rows"></tbody></table></div></section>
 
 <section class="view" id="v-learn"><div class="two">
 <div class="box card"><h2 class="h">Learning curve</h2><p class="sub" id="cnote">Measured with eval_learning_curve.py.</p><div id="curve"></div></div>
-<div class="box card"><h2 class="h">Content gaps memory has flagged</h2><p class="sub">Pulled from Hindsight, not from the raw log. Load history in the Content log tab if this is empty.</p><div class="gaps" id="gaps"></div></div>
+<div class="box card"><h2 class="h">Content gaps memory has flagged</h2><p class="sub">Pulled from Hindsight, not from the raw log. If this is empty, give it a moment — memory finishes indexing shortly after the server starts.</p><div class="gaps" id="gaps"></div></div>
 </div></section>
 </main>
 <script>
@@ -111,7 +111,7 @@ function cap(t,band){const c=$('#cap');c.style.display=t?'block':'none';c.classL
 
 // ---- memory panel (reads GET /memories)
 function drawMems(old){const box=$('#mems');box.innerHTML='';
-  if(!mems.length){box.innerHTML='<div class="empty">Nothing remembered yet. Load history from the Content log tab.</div>'}
+  if(!mems.length){box.innerHTML='<div class="empty">Still indexing the company\'s history — this only takes a moment after the server starts. Use Resync memory in the Content log tab if this doesn\'t fill in.</div>'}
   mems.forEach(m=>{const d=document.createElement('div');d.className='mem'+(old&&!old.has(m.x)?' new':'');d.dataset.t=m.t;
     const b=document.createElement('b');b.textContent=TY[m.t]||m.t;d.append(b,m.x);box.append(d)});
   $('#mc').textContent=mems.length+' memories shown, refreshed after every message';drawGaps()}
@@ -164,11 +164,23 @@ $('#cmp').onclick=()=>compare($('#q').value.trim()||'What should we write next?'
 
 // ---- content log (GET /content) and load (POST /load)
 async function loadRows(){try{rows=await j('/content');const tb=$('#rows');tb.innerHTML='';
-  rows.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?Number(c).toLocaleString():c;if(i>3)td.className='n';tr.append(td)});tb.append(tr)})}catch(e){err(e)}}
-async function loadHistory(){const b=$('#load');b.disabled=true;b.textContent='Loading…';
+  rows.forEach(r=>{const tr=document.createElement('tr');const pending=r[4]==='Pending';
+    r.forEach((c,i)=>{const td=document.createElement('td');
+      td.textContent=(i>3&&typeof c==='number')?c.toLocaleString():c;if(i>3){td.className='n';if(c==='Pending')td.style.color='var(--mu)'}tr.append(td)});
+    const act=document.createElement('td');
+    if(pending){const b=document.createElement('button');b.className='btn sm';b.textContent='Record results';
+      b.onclick=()=>recordResults(r[0],b);act.append(b)}
+    tr.append(act);tb.append(tr)})}catch(e){err(e)}}
+async function recordResults(title,btn){const views=prompt('Views for "'+title+'"?');if(views===null)return;
+  const conversions=prompt('Conversions for "'+title+'"?');if(conversions===null)return;
+  btn.disabled=true;btn.textContent='Saving…';
+  try{await j('/performance',{title,views:parseInt(views)||0,conversions:parseInt(conversions)||0});await loadRows();refresh()}
+  catch(e){err(e);btn.disabled=false;btn.textContent='Record results'}}
+async function loadHistory(){const b=$('#load'),orig=b.textContent;b.disabled=true;b.textContent='Resyncing…';
   try{const r=await j('/load',{});b.textContent=r.retained+' retained'+(r.failed?', '+r.failed+' failed':'');
-    for(let i=0;i<20;i++){await refresh();if(mems.length>=5)break;await sleep(3000)}}
-  catch(e){err(e);b.textContent='Load history into memory'}b.disabled=false}
+    for(let i=0;i<20;i++){await refresh();if(mems.length>=5)break;await sleep(3000)}
+    setTimeout(()=>b.textContent=orig,3000)}
+  catch(e){err(e);b.textContent=orig}b.disabled=false}
 $('#load').onclick=loadHistory;
 
 // ---- planner (POST /plan now returns {items, used}, POST /feedback)
@@ -190,7 +202,7 @@ function drawPlan(){const g=$('#grid');g.innerHTML='';$('#rf').style.display=pla
     const rj=document.createElement('button');rj.className='btn sm';rj.textContent='Reject';rj.onclick=()=>reject(i);
     a.append(ap,rj);c.append(tg,t,st,dt,a);d.append(h,c);g.append(d)})}
 async function callPlan(instruction){const r=await j('/plan',{memory:on,avoid,instruction:instruction||''});planUsed=r.used||[];drawUsed();return r.items}
-function approveIdea(i){const p=plan[i];if(!p)return;p.s='Scheduled';drawPlan();if(on){j('/feedback',{title:p.t,action:'approved'}).then(()=>setTimeout(refresh,3000)).catch(err)}}
+function approveIdea(i){const p=plan[i];if(!p)return;p.s='Scheduled';drawPlan();if(on){j('/feedback',{title:p.t,action:'approved',format:p.f,channel:p.c}).then(()=>{loadRows();setTimeout(refresh,3000)}).catch(err)}}
 async function reject(i){const p=plan[i];avoid.push(p.t);p.busy=true;drawPlan();
   try{const jobs=[callPlan()];if(on)jobs.push(j('/feedback',{title:p.t,action:'rejected',reason:''}));
     const [np]=await Promise.all(jobs);plan[i]={...(np[i]||np[0]),s:'Idea'};if(on)setTimeout(refresh,3000)}
@@ -235,7 +247,7 @@ $('#demo').onclick=async()=>{
   tab('chat');setOn(false);cap('1. Memory OFF — generic ideas any company would get');await sleep(1200);
   await ask(Q);await sleep(2500);
 
-  tab('log');cap('2. Content log — the fictional history we\'ll feed it');await sleep(1200);
+  tab('log');cap('2. Content log — the history the agent already remembers');await sleep(1200);
   if(mems.filter(m=>m.t==='perf').length<3)await loadHistory();await sleep(1500);
 
   setOn(true);tab('chat');cap('3. Memory ON — same question, now specific to Brightlane');await sleep(1000);

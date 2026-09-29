@@ -177,10 +177,81 @@ async def load_history_into_memory() -> dict:
 
 
 def content_rows() -> list[list]:
-    """The content log in the same row format the UI table uses."""
+    """The content log in the same row format the UI table uses.
+
+    Newly approved ideas show up here immediately, with "Pending" in place
+    of view/conversion numbers until record_performance() fills them in —
+    the log always reflects everything the agent has actually helped ship,
+    not just the original seed history.
+    """
     rows = []
+    for p in reversed(_load_published()):  # most recently approved first
+        when = datetime.strptime(p["published"], "%Y-%m-%d")
+        rows.append([p["title"], p["format"], p["channel"], f"{when:%b} {when.day}",
+                     p["views"] if p["views"] is not None else "Pending",
+                     p["conversions"] if p["conversions"] is not None else "Pending"])
     for p in load_seed()["posts"]:
-        date = datetime.strptime(p["published"], "%Y-%m-%d")
+        when = datetime.strptime(p["published"], "%Y-%m-%d")
         rows.append([p["title"], p["format"], p["channel"],
-                     f"{date:%b} {date.day}", p["views"], p["conversions"]])
+                     f"{when:%b} {when.day}", p["views"], p["conversions"]])
     return rows
+
+# --------------------------------------------- newly published ideas
+
+# Approved plan ideas get logged here, separately from seed_data.json, so
+# the original seed stays a clean, reusable fixture while the Content Log
+# can still show a live, growing record of everything the agent has
+# actually helped ship.
+PUBLISHED_FILE = Path(__file__).parent / "published.json"
+
+
+def _load_published() -> list[dict]:
+    if PUBLISHED_FILE.exists():
+        return json.loads(PUBLISHED_FILE.read_text(encoding="utf-8"))
+    return []
+
+
+def _save_published(rows: list[dict]) -> None:
+    PUBLISHED_FILE.write_text(json.dumps(rows, indent=2), encoding="utf-8")
+
+
+def pending_sentence(row: dict) -> str:
+    when = datetime.strptime(row["published"], "%Y-%m-%d")
+    return (
+        f"Content published: '{row['title']}' ({row['format']}) on {row['channel']}. "
+        f"Published on {when:%B %d, %Y}. Performance not measured yet."
+    )
+
+
+def add_published_idea(title: str, fmt: str, channel: str) -> dict:
+    """Record an approved idea as newly published, with no results yet."""
+    row = {
+        "title": title,
+        "format": fmt or "Idea",
+        "channel": channel or "TBD",
+        "published": datetime.now().strftime("%Y-%m-%d"),
+        "views": None,
+        "conversions": None,
+    }
+    rows = _load_published()
+    rows.append(row)
+    _save_published(rows)
+    return row
+
+
+async def record_performance(title: str, views: int, conversions: int) -> bool:
+    """Fill in real numbers once they're known. This is what closes the
+    loop: the idea the agent suggested becomes a fact it can cite later."""
+    rows = _load_published()
+    for row in rows:
+        if row["title"] == title and row["views"] is None:
+            row["views"], row["conversions"] = views, conversions
+            _save_published(rows)
+            when = datetime.fromisoformat(f"{row['published']}T09:00:00+00:00")
+            sentence = (
+                f"Content published: '{row['title']}' ({row['format']}) on "
+                f"{row['channel']}. Published on {when:%B %d, %Y}. "
+                f"It got {views:,} views and {conversions} conversions."
+            )
+            return await retain(sentence, "content performance", when)
+    return False
