@@ -42,6 +42,16 @@ async def _complete(messages: list[dict], temperature: float = 0.4) -> str:
     return (resp.choices[0].message.content or "").strip()
 
 
+async def _complete_stream(messages: list[dict], temperature: float = 0.4):
+    stream = await client().chat.completions.create(
+        model=MODEL, messages=messages, temperature=temperature, stream=True
+    )
+    async for chunk in stream:
+        piece = chunk.choices[0].delta.content
+        if piece:
+            yield piece
+
+
 def _memory_block(memories: list[str] | None) -> str:
     """Turn the recalled memories into text for the prompt."""
     if memories is None:
@@ -53,8 +63,7 @@ def _memory_block(memories: list[str] | None) -> str:
 
 # ----------------------------------------------------------------- chat
 
-async def chat_answer(message: str, memories: list[str] | None) -> str:
-    """memories=None means 'memory is OFF'; a list means 'memory is ON'."""
+def _chat_messages(message: str, memories: list[str] | None) -> list[dict]:
     prompt = (
         f"Today's date is {date.today():%B %d, %Y}.\n\n"
         f"{_memory_block(memories)}\n\n"
@@ -64,9 +73,18 @@ async def chat_answer(message: str, memories: list[str] | None) -> str:
         "feedback. If you have no memories, give sensible general advice and "
         "do not pretend to know the company's history."
     )
-    return await _complete(
-        [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}]
-    )
+    return [{"role": "system", "content": SYSTEM}, {"role": "user", "content": prompt}]
+
+
+async def chat_answer(message: str, memories: list[str] | None) -> str:
+    """memories=None means 'memory is OFF'; a list means 'memory is ON'."""
+    return await _complete(_chat_messages(message, memories))
+
+
+async def chat_answer_stream(message: str, memories: list[str] | None):
+    """Same as chat_answer, but yields text pieces as they arrive."""
+    async for piece in _complete_stream(_chat_messages(message, memories)):
+        yield piece
 
 
 # ----------------------------------------------------------------- plan
@@ -93,14 +111,22 @@ def _parse_plan(raw: str) -> list[dict]:
     return plan
 
 
-async def weekly_plan(memories: list[str] | None, avoid: list[str] | None = None) -> list[dict]:
+async def weekly_plan(
+    memories: list[str] | None, avoid: list[str] | None = None, instruction: str = ""
+) -> list[dict]:
     avoid_text = (
         "\nDo NOT suggest these ideas or close variants of them: " + "; ".join(avoid) + "\n"
         if avoid else ""
     )
+    instruction_text = (
+        f'\nThe marketer just asked, about the plan you\'d propose: "{instruction}"\n'
+        "Follow that instruction. Change only what it asks you to change and keep the rest "
+        "of the plan as it would otherwise be.\n"
+        if instruction.strip() else ""
+    )
     prompt = (
         f"Today's date is {date.today():%B %d, %Y}.\n\n"
-        f"{_memory_block(memories)}\n{avoid_text}\n"
+        f"{_memory_block(memories)}\n{avoid_text}{instruction_text}\n"
         "Plan next week's content: exactly 5 items, Monday to Friday.\n"
         "Reply with ONLY a JSON list, no other text. Each item must be an "
         'object with these keys: "d" (day: Mon, Tue, Wed, Thu or Fri), '

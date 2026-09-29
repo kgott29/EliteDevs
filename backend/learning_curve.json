@@ -1,0 +1,29 @@
+{
+  "question": "Plan next week's content (5 ideas)",
+  "metric": "share of the 5 ideas that cite real evidence and no made-up numbers",
+  "runs": 3,
+  "generated": "2026-09-29T06:24:35.304460+00:00",
+  "points": [
+    {
+      "label": "Interaction 1",
+      "score": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "fabricated": 0
+    },
+    {
+      "label": "Interaction 5",
+      "score": 0.4,
+      "min": 0.4,
+      "max": 0.4,
+      "fabricated": 0
+    },
+    {
+      "label": "Interaction 20",
+      "score": 0.8,
+      "min": 0.6,
+      "max": 1.0,
+      "fabricated": 0
+    }
+  ]
+}

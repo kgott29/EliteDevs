@@ -199,11 +199,15 @@ async def main():
         "runs": len(runs), "generated": datetime.now(timezone.utc).isoformat(),
         "points": points,
     }, indent=2), encoding="utf-8")
+    
     ANSWERS.write_text(json.dumps(
         {f"interaction_{r['interaction']}": r["plan"] for r in runs[0]}, indent=2), encoding="utf-8")
     print("\nSaved", OUT.name, "and", ANSWERS.name)
     for p in points:
         print(f"  {p['label']}: {p['score']:.0%} (range {p['min']:.0%}-{p['max']:.0%})")
+        close = getattr(memory.client(), "aclose", None)
+    if close:
+        await close()
 
 
 if __name__ == "__main__":

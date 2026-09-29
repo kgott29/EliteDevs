@@ -6,16 +6,16 @@ Run with:  uvicorn main:app --reload
 Then open: http://127.0.0.1:8000
 """
 
+import json
 import logging
 from pathlib import Path
-import json
 
 from dotenv import load_dotenv
 
 load_dotenv()  # read the .env file BEFORE importing our own modules
 
 from fastapi import BackgroundTasks, FastAPI, HTTPException  # noqa: E402
-from fastapi.responses import FileResponse  # noqa: E402
+from fastapi.responses import FileResponse, StreamingResponse  # noqa: E402
 from pydantic import BaseModel  # noqa: E402
 
 import llm  # noqa: E402
@@ -28,12 +28,8 @@ from contextlib import asynccontextmanager  # noqa: E402
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await memory.ensure_bank()
-
-    try:
-        yield
-    finally:
-        await memory.close_client()
+    await memory.ensure_bank()  # runs once when the server starts
+    yield
 
 
 app = FastAPI(title="Brightlane Content Strategist", lifespan=lifespan)
@@ -52,6 +48,7 @@ class ChatIn(BaseModel):
 class PlanIn(BaseModel):
     memory: bool = True
     avoid: list[str] = []  # ideas rejected in this session (shown right away)
+    instruction: str = ""  # a follow-up like "swap Wednesday for a case study"
 
 
 class FeedbackIn(BaseModel):
@@ -100,6 +97,42 @@ async def chat(body: ChatIn, tasks: BackgroundTasks):
     return {"text": text, "used": used[:8]}
 
 
+@app.post("/chat/stream")
+async def chat_stream(body: ChatIn, tasks: BackgroundTasks):
+    message = body.message.strip()
+    if not message:
+        raise HTTPException(400, "message is empty")
+
+    used: list[str] = []
+    if body.memory:
+        used = await memory.recall_many([
+            message,
+            "brand voice and target audience",
+            "which content formats and topics perform best",
+            "ideas the marketer approved or rejected, and feedback they gave",
+        ])
+
+    if body.memory and not message.endswith("?"):
+        tasks.add_task(
+            memory.retain,
+            f'The marketer told the strategist: "{message}"',
+            "feedback from the marketer",
+        )
+
+    async def gen():
+        try:
+            async for piece in llm.chat_answer_stream(message, used if body.memory else None):
+                yield piece
+        except Exception as e:
+            yield f"\n[error: {e}]"
+
+    return StreamingResponse(
+        gen(), media_type="text/plain",
+        headers={"X-Used-Memories": json.dumps(used[:8])},
+        background=tasks,
+    )
+
+
 @app.get("/memories")
 async def memories():
     return await memory.list_memories()
@@ -128,9 +161,10 @@ async def plan(body: PlanIn):
             "ideas the marketer approved or rejected, and why",
         ], per_query=8)
     try:
-        return await llm.weekly_plan(used, body.avoid)
+        items = await llm.weekly_plan(used, body.avoid, body.instruction)
     except Exception as e:
         raise HTTPException(502, f"LLM error: {e}")
+    return {"items": items, "used": used or []}
 
 
 @app.post("/feedback")

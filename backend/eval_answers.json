@@ -1,0 +1,113 @@
+{
+  "interaction_1": [
+    {
+      "d": "Mon",
+      "f": "How-to",
+      "c": "Blog",
+      "t": "Automating Invoice Approvals: A Step\u2011by\u2011Step Guide for Finance Teams",
+      "w": "No prior data to reference, but a practical how\u2011to aligns with Brightlane\u2019s focus on workflow automation for finance."
+    },
+    {
+      "d": "Tue",
+      "f": "Video",
+      "c": "LinkedIn",
+      "t": "Live Demo: Reducing Manual Reconciliation Time with Brightlane",
+      "w": "Without historical insights, a short demo video showcases product value and engages LinkedIn\u2019s professional audience."
+    },
+    {
+      "d": "Wed",
+      "f": "Case study",
+      "c": "Blog",
+      "t": "How a Mid\u2011Size CFO Cut Closing Cycle by 30% Using Brightlane",
+      "w": "No past examples are available, but a case study provides credible proof of concept for prospective finance leaders."
+    },
+    {
+      "d": "Thu",
+      "f": "Newsletter",
+      "c": "Email",
+      "t": "Weekly Automation Tips: Boosting Finance Team Efficiency",
+      "w": "Given the lack of historical metrics, a tips\u2011focused newsletter keeps subscribers engaged with actionable content."
+    },
+    {
+      "d": "Fri",
+      "f": "Infographic",
+      "c": "LinkedIn",
+      "t": "The Finance Automation Landscape 2026: Key Trends & Opportunities",
+      "w": "With no prior data, an infographic offers a visual snapshot that positions Brightlane as a thought leader."
+    }
+  ],
+  "interaction_5": [
+    {
+      "d": "Mon",
+      "f": "How-to",
+      "c": "Blog",
+      "t": "Advanced tips for cleaning up duplicate records",
+      "w": "Our last how\u2011to blog on duplicate records got 10,200 views and 41 conversions, showing strong audience interest in data\u2011quality guides."
+    },
+    {
+      "d": "Tue",
+      "f": "Opinion",
+      "c": "LinkedIn",
+      "t": "Common pitfalls in finance automation projects",
+      "w": "The July 7 LinkedIn opinion piece earned 2,400 views and 8 conversions, indicating demand for automation\u2011strategy insights."
+    },
+    {
+      "d": "Wed",
+      "f": "Video",
+      "c": "LinkedIn",
+      "t": "Finance team saves 20% time with Brightlane automation",
+      "w": "We have no prior video performance data, so this is a new format to test audience response."
+    },
+    {
+      "d": "Thu",
+      "f": "Newsletter",
+      "c": "Email",
+      "t": "Weekly automation insights for finance ops",
+      "w": "There is no history of newsletters, making this a fresh channel to engage finance and operations managers."
+    },
+    {
+      "d": "Fri",
+      "f": "Infographic",
+      "c": "LinkedIn",
+      "t": "Automation ROI checklist for mid\u2011size finance teams",
+      "w": "No past infographic metrics exist, so this will help us explore visual content performance."
+    }
+  ],
+  "interaction_20": [
+    {
+      "d": "Mon",
+      "f": "How-to",
+      "c": "LinkedIn",
+      "t": "How to reconcile invoices automatically",
+      "w": "Approved idea; mirrors the 9,000\u2011view how\u2011to on scheduling reports that resonated with finance managers."
+    },
+    {
+      "d": "Tue",
+      "f": "Quick tip",
+      "c": "LinkedIn",
+      "t": "Quick tip: rename your workflows",
+      "w": "Approved idea; short, casual tip fits the brand voice and follows the 60\u2011second video that earned 5,200 views."
+    },
+    {
+      "d": "Wed",
+      "f": "Case study",
+      "c": "Blog",
+      "t": "Finance team cuts month\u2011end close time by 30% with Brightlane",
+      "w": "Finance managers love real results; similar opinion pieces on automation strategy got 3,500+ views, so a case study should perform well."
+    },
+    {
+      "d": "Thu",
+      "f": "Opinion",
+      "c": "LinkedIn",
+      "t": "Why most automation projects stall \u2013 the data hygiene factor",
+      "w": "Builds on the successful opinion articles (e.g., 3,500 views on \"Stop calling it digital transformation\")."
+    },
+    {
+      "d": "Fri",
+      "f": "Quick tip",
+      "c": "Email",
+      "t": "Friday tip: One\u2011click report scheduling without code",
+      "w": "Leverages the high\u2011performing \"How to schedule reports without code\" (9,000 views) in a concise email format."
+    }
+  ]
+}

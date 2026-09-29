@@ -4,9 +4,9 @@
 <title>Brightlane Content Strategist</title>
 <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-:root{box-sizing:border-box;--bg:#f6f6fb;--sf:#fff;--ink:#1d1c30;--mu:#6a6980;--ac:#4f46e5;--acs:#eceaff;--ln:#e3e2ee;--ok:#1f8a5b;--fl:#fff3b8}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--fl:#4a4310}}
-:root[data-theme="dark"]{--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--fl:#4a4310}
+:root{box-sizing:border-box;--bg:#f6f6fb;--sf:#fff;--ink:#1d1c30;--mu:#6a6980;--ac:#4f46e5;--acs:#eceaff;--ln:#e3e2ee;--ok:#1f8a5b;--fl:#fff3b8;--nu:#fff7e8;--nub:#e8b23d}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--fl:#4a4310;--nu:#332b12;--nub:#c99a2e}}
+:root[data-theme="dark"]{--bg:#12121c;--sf:#1b1b29;--ink:#ececf6;--mu:#9d9cb5;--ac:#8b85ff;--acs:#2a2850;--ln:#2d2d40;--ok:#4cc38a;--fl:#4a4310;--nu:#332b12;--nub:#c99a2e}
 *,*:before,*:after{box-sizing:inherit}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Figtree,system-ui,sans-serif}
 header{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;padding:12px 20px;background:var(--sf);border-bottom:1px solid var(--ln)}
@@ -22,6 +22,7 @@ button:focus-visible,input:focus-visible,[contenteditable]:focus-visible,.sw:foc
 .btn{border:1px solid var(--ln);background:var(--sf);color:var(--ink);font:inherit;font-weight:500;padding:7px 12px;border-radius:8px;cursor:pointer}
 .btn.p{background:var(--ac);border-color:var(--ac);color:#fff}.btn.sm{padding:3px 9px;font-size:13px}.btn:disabled{opacity:.55;cursor:default}
 #cap,#err{display:none;padding:8px 20px;font-weight:600}#cap{background:var(--acs);color:var(--ac)}#err{background:#fde8e2;color:#9a3412}
+#cap.band{background:var(--ac);color:#fff;text-align:center;letter-spacing:.02em}
 main{padding:16px 20px;max-width:1200px;margin:0 auto}
 .view{display:none}.view.on{display:block}
 .chat{display:grid;grid-template-columns:1fr 320px;gap:16px;height:calc(100vh - 150px);min-height:480px}
@@ -29,8 +30,13 @@ main{padding:16px 20px;max-width:1200px;margin:0 auto}
 .box{background:var(--sf);border:1px solid var(--ln);border-radius:12px}
 .cw{display:flex;flex-direction:column;min-height:0}
 #log{flex:1;overflow:auto;padding:16px;display:flex;flex-direction:column;gap:12px;min-height:280px}
-.m{max-width:85%;padding:10px 14px;border-radius:12px;background:var(--bg)}
-.m.u{align-self:flex-end;background:var(--ac);color:#fff}.m.t{color:var(--mu)}
+.m{max-width:85%;padding:10px 14px;border-radius:12px;background:var(--bg);white-space:pre-wrap}
+.m.u{align-self:flex-end;background:var(--ac);color:#fff}
+.m.nudge{background:var(--nu);border:1px solid var(--nub);display:flex;flex-direction:column;gap:8px;max-width:95%}
+.dots span{display:inline-block;width:5px;height:5px;margin-right:3px;border-radius:50%;background:var(--mu);animation:b 1.2s infinite}
+.dots span:nth-child(2){animation-delay:.2s}.dots span:nth-child(3){animation-delay:.4s}
+@keyframes b{0%,80%,100%{opacity:.25}40%{opacity:1}}
+.cur:after{content:'▍';animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
 .m details{margin-top:8px;font-size:13px;color:var(--mu)}.m summary{cursor:pointer;color:var(--ac);font-weight:500}
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-self:stretch}
 .cmp>div{padding:10px 14px;border-radius:12px;background:var(--bg)}.cmp b{display:block;font-size:13px;color:var(--mu)}
@@ -41,7 +47,7 @@ aside{padding:14px;overflow:auto}aside h2,.h{font-size:15px;margin:0 0 4px}.sub{
 .mem{border-left:3px solid var(--c,var(--ac));padding:6px 10px;margin-bottom:8px;background:var(--bg);border-radius:0 8px 8px 0;font-size:13px}
 .mem b{display:block;font-size:12px;color:var(--mu);font-weight:600}
 .mem.new{animation:fl 1.6s}@keyframes fl{from{background:var(--fl)}}
-@media(prefers-reduced-motion:reduce){.mem.new{animation:none}}
+@media(prefers-reduced-motion:reduce){.mem.new,.dots span,.cur:after{animation:none}}
 [data-t=voice]{--c:#4f46e5}[data-t=perf]{--c:#1f8a5b}[data-t=gap]{--c:#c2410c}[data-t=feedback]{--c:#b4237a}
 .tw{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:620px}
 th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{color:var(--mu);font-weight:600;font-size:13px}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
@@ -52,9 +58,11 @@ th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{colo
 .tag{font-size:12px;color:var(--ac);font-weight:600}.st{font-size:12px;color:var(--mu)}.st.ok{color:var(--ok)}
 .ttl{font-weight:600}.why{font-size:13px;color:var(--mu)}.acts{display:flex;gap:6px;margin-top:auto}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:820px){.two{grid-template-columns:1fr}}
-.card{padding:16px}.hm{display:grid;grid-template-columns:90px repeat(8,1fr);gap:3px;align-items:center;font-size:13px}
-.hm span.c{height:22px;border-radius:4px;background:var(--ln)}.hm span.c.h{background:var(--ac)}
+.card{padding:16px}
+.gaps{display:flex;flex-direction:column;gap:8px}
+.gaps .mem{margin-bottom:0}
 .empty{color:var(--mu);padding:30px;text-align:center}
+.planused{font-size:13px;color:var(--mu);margin:-4px 0 10px}.planused summary{cursor:pointer;color:var(--ac);font-weight:500}
 </style></head><body>
 <header>
 <div class="brand">Content Strategist<small>Brightlane, workflow automation for finance teams</small></div>
@@ -72,9 +80,12 @@ th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{colo
 </div></section>
 
 <section class="view" id="v-plan">
-<div class="bar"><div><h2 class="h">This week's plan</h2><p class="sub" style="margin:0">Each idea shows the reasoning behind it. Reject one and the agent remembers.</p></div>
+<div class="bar"><div><h2 class="h">This week's plan</h2><p class="sub" style="margin:0">Each idea shows the reasoning behind it. Reject one, or ask for a revision below.</p></div>
 <button class="btn p" id="gen">Generate this week's plan</button></div>
-<div class="grid" id="grid"></div></section>
+<details class="planused" id="planused" style="display:none"><summary></summary><div id="planusedlist"></div></details>
+<div class="grid" id="grid"></div>
+<form id="rf" style="display:none;margin-top:12px;gap:8px" class="box"><input type="text" id="rq" placeholder="Name a day to change just that slot, e.g. &quot;swap Wednesday for a case study&quot;" aria-label="Revision instruction" style="border:0"><button class="btn p" id="rsend">Revise</button></form>
+</section>
 
 <section class="view" id="v-log">
 <div class="bar"><div><h2 class="h">Content log</h2><p class="sub" style="margin:0">Sample history for a fictional company. Loading it stores what worked in Hindsight.</p></div>
@@ -83,38 +94,59 @@ th,td{text-align:left;padding:9px 12px;border-bottom:1px solid var(--ln)}th{colo
 
 <section class="view" id="v-learn"><div class="two">
 <div class="box card"><h2 class="h">Learning curve</h2><p class="sub" id="cnote">Measured with eval_learning_curve.py.</p><div id="curve"></div></div>
-<div class="box card"><h2 class="h">Coverage by format, last 8 weeks</h2><p class="sub">Dark cells mean something was published. Empty rows are gaps.</p><div class="hm" id="hm"></div></div>
+<div class="box card"><h2 class="h">Content gaps memory has flagged</h2><p class="sub">Pulled from Hindsight, not from the raw log. Load history in the Content log tab if this is empty.</p><div class="gaps" id="gaps"></div></div>
 </div></section>
 </main>
 <script>
 const $=s=>document.querySelector(s),sleep=ms=>new Promise(r=>setTimeout(r,ms));
 const TY={voice:'Brand voice',perf:'Performance',gap:'Gap',feedback:'Feedback'};
-let on=true,mems=[],seen=null,plan=[],avoid=[],rows=[];
+let on=true,mems=[],seen=null,plan=[],avoid=[],rows=[],planUsed=[],nudged=false;
 
 async function j(path,body){
   const r=await fetch(path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
   if(!r.ok){let m='';try{m=(await r.json()).detail}catch(e){}throw new Error(m||('HTTP '+r.status))}
   return r.json()}
 function err(e){const b=$('#err');b.textContent='Something went wrong: '+(e.message||e);b.style.display='block';clearTimeout(err.t);err.t=setTimeout(()=>b.style.display='none',7000)}
-function cap(t){const c=$('#cap');c.style.display=t?'block':'none';c.textContent=t||''}
+function cap(t,band){const c=$('#cap');c.style.display=t?'block':'none';c.classList.toggle('band',!!band);c.textContent=t||''}
 
 // ---- memory panel (reads GET /memories)
 function drawMems(old){const box=$('#mems');box.innerHTML='';
   if(!mems.length){box.innerHTML='<div class="empty">Nothing remembered yet. Load history from the Content log tab.</div>'}
   mems.forEach(m=>{const d=document.createElement('div');d.className='mem'+(old&&!old.has(m.x)?' new':'');d.dataset.t=m.t;
     const b=document.createElement('b');b.textContent=TY[m.t]||m.t;d.append(b,m.x);box.append(d)});
-  $('#mc').textContent=mems.length+' memories shown, refreshed after every message'}
-async function refresh(){try{mems=await j('/memories');const old=seen;seen=new Set(mems.map(m=>m.x));drawMems(old)}catch(e){}}
+  $('#mc').textContent=mems.length+' memories shown, refreshed after every message';drawGaps()}
+function drawGaps(){const box=$('#gaps');if(!box)return;const gaps=mems.filter(m=>m.t==='gap');box.innerHTML='';
+  if(!gaps.length){box.innerHTML='<div class="empty">No gaps flagged yet.</div>';return}
+  gaps.forEach(m=>{const d=document.createElement('div');d.className='mem';d.dataset.t='gap';d.textContent=m.x;box.append(d)})}
+async function refresh(){try{const fresh=await j('/memories');const old=seen;mems=fresh;seen=new Set(mems.map(m=>m.x));drawMems(old);maybeNudge()}catch(e){}}
 
-// ---- chat (POST /chat)
-function bubble(cls,text,used){$('#e1')?.remove();const d=document.createElement('div');d.className='m '+cls;d.textContent=text;
-  if(used&&used.length){const de=document.createElement('details'),s=document.createElement('summary');s.textContent='Based on '+used.length+' memories';de.append(s);
-    used.forEach(u=>{const p=document.createElement('div');p.textContent='• '+u;de.append(p)});d.append(de)}
-  $('#log').append(d);$('#log').scrollTop=1e9;return d}
-async function ask(q){bubble('u',q);const t=bubble('a t','Thinking…');
-  try{const r=await j('/chat',{message:q,memory:on});t.remove();bubble('a',r.text,r.used)}catch(e){t.remove();err(e)}
+// ---- proactive nudge: as soon as a gap shows up in memory, offer to act on it
+function maybeNudge(){
+  if(nudged)return;const gap=mems.find(m=>m.t==='gap');if(!gap)return;nudged=true;
+  $('#e1')?.remove();const d=document.createElement('div');d.className='m nudge';
+  const t=document.createElement('div');t.textContent='I noticed something: '+gap.x;
+  const b=document.createElement('button');b.className='btn sm p';b.style.alignSelf='flex-start';b.textContent='Suggest something for it';
+  b.onclick=()=>{b.remove();ask('Give me one specific idea to close that gap.')};
+  d.append(t,b);$('#log').append(d);$('#log').scrollTop=1e9}
+
+// ---- chat (streams from POST /chat/stream, falls back to POST /chat)
+function bubble(cls,text){$('#e1')?.remove();const d=document.createElement('div');d.className='m '+cls;d.textContent=text||'';$('#log').append(d);$('#log').scrollTop=1e9;return d}
+function typing(){const d=bubble('a');d.innerHTML='<span class="dots"><span></span><span></span><span></span></span>';return d}
+function citeInto(d,used){if(!used||!used.length)return;const de=document.createElement('details'),s=document.createElement('summary');s.textContent='Based on '+used.length+' memories';de.append(s);
+  used.forEach(u=>{const p=document.createElement('div');p.textContent='• '+u;de.append(p)});d.append(de)}
+async function ask(q){bubble('u',q);const d=typing();let used=[];
+  try{
+    const r=await fetch('/chat/stream',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message:q,memory:on})});
+    if(!r.ok||!r.body)throw new Error('no stream');
+    try{used=JSON.parse(r.headers.get('X-Used-Memories')||'[]')}catch(e){}
+    d.textContent='';d.classList.add('cur');const reader=r.body.getReader(),dec=new TextDecoder();let full='';
+    while(true){const {done,value}=await reader.read();if(done)break;full+=dec.decode(value,{stream:true});d.textContent=full;$('#log').scrollTop=1e9}
+    d.classList.remove('cur');citeInto(d,used);
+  }catch(e){
+    try{const r=await j('/chat',{message:q,memory:on});d.textContent=r.text;citeInto(d,r.used)}catch(e2){d.remove();err(e2);return}
+  }
   if(on){refresh();setTimeout(refresh,5000)}}
-async function compare(q){bubble('u',q);const t=bubble('a t','Asking both ways…');
+async function compare(q){bubble('u',q);const t=typing();
   try{const [a,b]=await Promise.all([j('/chat',{message:q,memory:false}),j('/chat',{message:q,memory:true})]);t.remove();
     const d=document.createElement('div');d.className='cmp';
     [['Memory off',a],['Memory on',b]].forEach(([l,r])=>{const c=document.createElement('div'),h=document.createElement('b');h.textContent=l;c.append(h,r.text);d.append(c)});
@@ -132,35 +164,57 @@ $('#cmp').onclick=()=>compare($('#q').value.trim()||'What should we write next?'
 
 // ---- content log (GET /content) and load (POST /load)
 async function loadRows(){try{rows=await j('/content');const tb=$('#rows');tb.innerHTML='';
-  rows.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?Number(c).toLocaleString():c;if(i>3)td.className='n';tr.append(td)});tb.append(tr)});drawHeat()}catch(e){err(e)}}
+  rows.forEach(r=>{const tr=document.createElement('tr');r.forEach((c,i)=>{const td=document.createElement('td');td.textContent=i>3?Number(c).toLocaleString():c;if(i>3)td.className='n';tr.append(td)});tb.append(tr)})}catch(e){err(e)}}
 async function loadHistory(){const b=$('#load');b.disabled=true;b.textContent='Loading…';
   try{const r=await j('/load',{});b.textContent=r.retained+' retained'+(r.failed?', '+r.failed+' failed':'');
     for(let i=0;i<20;i++){await refresh();if(mems.length>=5)break;await sleep(3000)}}
   catch(e){err(e);b.textContent='Load history into memory'}b.disabled=false}
 $('#load').onclick=loadHistory;
 
-// ---- planner (POST /plan, POST /feedback)
-function drawPlan(){const g=$('#grid');g.innerHTML='';
+// ---- planner (POST /plan now returns {items, used}, POST /feedback)
+function drawUsed(){const box=$('#planused'),sum=box.querySelector('summary'),list=$('#planusedlist');
+  if(!planUsed.length){box.style.display='none';return}
+  box.style.display='block';sum.textContent='This plan was built from '+planUsed.length+' memories';
+  list.innerHTML='';planUsed.forEach(u=>{const p=document.createElement('div');p.textContent='• '+u;list.append(p)})}
+function drawPlan(){const g=$('#grid');g.innerHTML='';$('#rf').style.display=plan.length?'flex':'none';
   if(!plan.length){g.innerHTML='<div class="empty" style="grid-column:1/-1">No plan yet. Generate one and see what the agent suggests.</div>';return}
   plan.forEach((p,i)=>{const d=document.createElement('div');d.className='day';const h=document.createElement('h3');h.textContent=p.d;
     const c=document.createElement('div');c.className='box slot';
-    if(p.busy){c.innerHTML='<div class="empty">Finding a replacement…</div>';d.append(h,c);g.append(d);return}
+    if(p.busy){c.innerHTML='<div class="empty">Updating…</div>';d.append(h,c);g.append(d);return}
     const tg=document.createElement('div');tg.className='tag';tg.textContent=p.f+' on '+p.c;
     const t=document.createElement('div');t.className='ttl';t.contentEditable=true;t.textContent=p.t;t.oninput=()=>p.t=t.textContent;
     const st=document.createElement('div');st.className='st'+(p.s==='Scheduled'?' ok':'');st.textContent=p.s;
     const dt=document.createElement('details');dt.className='why';const sm=document.createElement('summary');sm.textContent='Why this?';sm.style.cursor='pointer';dt.append(sm,p.w);
     const a=document.createElement('div');a.className='acts';
-    const ap=document.createElement('button');ap.className='btn sm';ap.textContent='Approve';
-    ap.onclick=()=>{p.s='Scheduled';drawPlan();if(on){j('/feedback',{title:p.t,action:'approved'}).then(()=>setTimeout(refresh,3000)).catch(err)}};
+    const ap=document.createElement('button');ap.className='btn sm';ap.textContent='Approve';ap.onclick=()=>approveIdea(i);
     const rj=document.createElement('button');rj.className='btn sm';rj.textContent='Reject';rj.onclick=()=>reject(i);
     a.append(ap,rj);c.append(tg,t,st,dt,a);d.append(h,c);g.append(d)})}
+async function callPlan(instruction){const r=await j('/plan',{memory:on,avoid,instruction:instruction||''});planUsed=r.used||[];drawUsed();return r.items}
+function approveIdea(i){const p=plan[i];if(!p)return;p.s='Scheduled';drawPlan();if(on){j('/feedback',{title:p.t,action:'approved'}).then(()=>setTimeout(refresh,3000)).catch(err)}}
 async function reject(i){const p=plan[i];avoid.push(p.t);p.busy=true;drawPlan();
-  try{const jobs=[j('/plan',{memory:on,avoid})];if(on)jobs.push(j('/feedback',{title:p.t,action:'rejected',reason:''}));
+  try{const jobs=[callPlan()];if(on)jobs.push(j('/feedback',{title:p.t,action:'rejected',reason:''}));
     const [np]=await Promise.all(jobs);plan[i]={...(np[i]||np[0]),s:'Idea'};if(on)setTimeout(refresh,3000)}
   catch(e){err(e);p.busy=false}drawPlan()}
 async function gen(){const b=$('#gen');b.disabled=true;$('#grid').innerHTML='<div class="empty" style="grid-column:1/-1">Planning…</div>';
-  try{plan=(await j('/plan',{memory:on,avoid})).map(p=>({...p,s:'Idea'}))}catch(e){err(e);plan=[]}b.disabled=false;drawPlan()}
+  try{plan=(await callPlan()).map(p=>({...p,s:'Idea'}))}catch(e){err(e);plan=[]}b.disabled=false;drawPlan()}
 $('#gen').onclick=gen;drawPlan();
+const DAY_WORDS={mon:'Mon',monday:'Mon',tue:'Tue',tues:'Tue',tuesday:'Tue',wed:'Wed',weds:'Wed',wednesday:'Wed',thu:'Thu',thur:'Thu',thurs:'Thu',thursday:'Thu',fri:'Fri',friday:'Fri'};
+function detectDay(q){const m=q.toLowerCase().match(/\b(mon|monday|tue|tues|tuesday|wed|weds|wednesday|thu|thur|thurs|thursday|fri|friday)\b/);return m?DAY_WORDS[m[1]]:null}
+async function revisePlan(q){if(!q||!plan.length)return;const day=detectDay(q);
+  if(day){
+    const idx=plan.findIndex(p=>p.d===day);
+    if(idx>=0){plan[idx].busy=true;drawPlan()}
+    try{const items=await callPlan(q);const match=items.find(it=>it.d===day)||items[idx>=0?idx:0];
+      if(idx>=0&&match)plan[idx]={...match,s:'Idea'}}
+    catch(e){err(e)}
+    if(idx>=0)plan[idx].busy=false;
+  }else{
+    plan.forEach(p=>p.busy=true);drawPlan();
+    try{plan=(await callPlan(q)).map(p=>({...p,s:'Idea'}))}catch(e){err(e)}
+  }
+  drawPlan()}
+$('#rf').onsubmit=async e=>{e.preventDefault();const q=$('#rq').value.trim();if(!q)return;$('#rq').value='';
+  const b=$('#rsend');b.disabled=true;await revisePlan(q);b.disabled=false};
 
 // ---- learning curve (GET /learning-curve) and coverage (from /content)
 async function drawCurve(){const box=$('#curve');
@@ -170,21 +224,45 @@ async function drawCurve(){const box=$('#curve');
       s+=`<rect x="${x}" y="${150-h}" width="60" height="${h}" rx="6" fill="var(--ac)" opacity="${.4+i*.3}"/><text x="${x+30}" y="${142-h}" text-anchor="middle" fill="var(--ink)" font-size="13" font-weight="600">${n}%</text><text x="${x+30}" y="172" text-anchor="middle" fill="var(--mu)" font-size="11">${l}</text>`});
     box.innerHTML=s+'</svg>';$('#cnote').textContent=d.metric+'. Averaged over '+d.runs+' runs.'}
   catch(e){box.innerHTML='<div class="empty">No results yet. Run eval_learning_curve.py, then reload.</div>'}}
-function drawHeat(){const h=$('#hm');h.innerHTML='';if(!rows.length)return;
-  const M={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
-  const pts=rows.map(r=>{const [m,d]=r[3].split(' ');return{f:r[1],t:new Date(2026,M[m],+d).getTime()}});
-  const end=Math.max(...pts.map(p=>p.t)),fm={};
-  pts.forEach(p=>{const w=Math.floor((end-p.t)/6048e5);if(w<8){(fm[p.f]=fm[p.f]||Array(8).fill(0))[7-w]++}});
-  pts.forEach(p=>{fm[p.f]=fm[p.f]||Array(8).fill(0)});
-  Object.entries(fm).forEach(([k,r])=>{const l=document.createElement('span');l.textContent=k;h.append(l);r.forEach(c=>{const s=document.createElement('span');s.className='c'+(c?' h':'');h.append(s)})})}
+// ---- demo mode: same story, real endpoints, ends on the nudge if one fires
+$('#demo').onclick=async()=>{
+  const b=$('#demo'),navBtns=[...document.querySelectorAll('#tabs button'),$('#sw')];
+  b.disabled=true;navBtns.forEach(x=>x.disabled=true);
+  $('#log').innerHTML='';plan=[];avoid=[];nudged=false;drawPlan();
+  const Q='What should we write next?';
+  cap('▶ Demo mode started','band');await sleep(1800);
 
-// ---- demo mode: same story, real endpoints
-$('#demo').onclick=async()=>{const b=$('#demo');b.disabled=true;$('#log').innerHTML='';plan=[];avoid=[];drawPlan();const Q='What should we write next?';
-  tab('chat');setOn(false);cap('1. No memory: generic ideas any company would get');await sleep(1200);await ask(Q);await sleep(2500);
-  tab('log');cap('2. Feeding it the content history');await sleep(1200);if(mems.length<5)await loadHistory();await sleep(1500);
-  setOn(true);tab('chat');cap('3. Same question, now with memory');await sleep(1000);await ask(Q);await sleep(3000);
-  tab('plan');cap("4. Next week, planned from what worked");await gen();await sleep(3000);
-  cap('This gets smarter every week.');await sleep(2500);cap('');b.disabled=false};
+  tab('chat');setOn(false);cap('1. Memory OFF — generic ideas any company would get');await sleep(1200);
+  await ask(Q);await sleep(2500);
+
+  tab('log');cap('2. Content log — the fictional history we\'ll feed it');await sleep(1200);
+  if(mems.filter(m=>m.t==='perf').length<3)await loadHistory();await sleep(1500);
+
+  setOn(true);tab('chat');cap('3. Memory ON — same question, now specific to Brightlane');await sleep(1000);
+  await ask(Q);await sleep(2800);
+
+  cap('4. Side by side: memory off vs on, same question');await sleep(1000);
+  await compare(Q);await sleep(3000);
+
+  tab('plan');cap('5. Planner — a full week built from what worked');await sleep(1000);
+  await gen();await sleep(2800);
+
+  if(plan.length){
+    cap('6. Reject an idea — it won\'t be suggested again');await sleep(1000);
+    await reject(0);await sleep(2600);
+    const day=plan[1]?.d;
+    cap('7. Revise just one day — "swap '+(day||'Tuesday')+' for a case study"');await sleep(1000);
+    await revisePlan('swap '+(day||'Tuesday')+' for a case study');await sleep(2600);
+    cap('8. Approve an idea — it\'s scheduled and remembered');await sleep(1000);
+    approveIdea(2);await sleep(2200);
+  }
+
+  tab('learn');cap('9. Learning curve — measured, not typed in, plus flagged gaps');await sleep(2800);
+
+  tab('chat');await refresh();cap('This gets smarter every week.');await sleep(2400);
+  cap('■ Demo mode ended','band');await sleep(2200);cap('');
+  b.disabled=false;navBtns.forEach(x=>x.disabled=false);
+};
 
 refresh();loadRows();drawCurve();
 </script></body></html>

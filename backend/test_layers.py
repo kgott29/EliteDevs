@@ -89,7 +89,7 @@ def test_groq_failure_gives_clean_502(client, monkeypatch):
 def test_plan_retries_bad_json_then_succeeds(client, monkeypatch):
     patch_llm(monkeypatch, ["not json", "still {broken", f"```json\n{GOOD_PLAN}\n```"])
     r = client.post("/plan", json={})
-    assert r.status_code == 200 and len(r.json()) == 5
+    assert r.status_code == 200 and len(r.json()["items"]) == 5
 
 
 def test_plan_gives_up_after_three_bad_replies(client, monkeypatch):
@@ -176,7 +176,7 @@ def test_live_brand_new_empty_bank(monkeypatch):
         r = c.post("/chat", json={"message": "What should we write next?"})
         assert r.status_code == 200 and r.json()["text"]
         r = c.post("/plan", json={})
-        assert r.status_code == 200 and len(r.json()) == 5
+        assert r.status_code == 200 and len(r.json()["items"]) == 5
 
 
 @pytest.mark.live
